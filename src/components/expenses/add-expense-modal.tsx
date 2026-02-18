@@ -150,11 +150,10 @@ export function AddExpenseModal({ open, onOpenChange }: AddExpenseModalProps) {
                             name="amount"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Amount ($) / المبلغ</FormLabel>
+                                    <FormLabel>Amount (ILS) / المبلغ</FormLabel>
                                     <FormControl>
                                         <Input
                                             type="number"
-                                            step="0.01"
                                             {...field}
                                             onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                             value={field.value || ""}

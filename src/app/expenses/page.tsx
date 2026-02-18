@@ -1,9 +1,10 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { Plus, Search, DollarSign } from "lucide-react"
+import { Plus, Search, Coins } from "lucide-react"
 import { useState } from "react"
 import { format } from "date-fns"
+import { formatCurrency } from "@/lib/utils"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -94,8 +95,8 @@ export default function ExpensesPage() {
                             />
                         </div>
                         <div className="flex items-center gap-2 text-amber-400 font-bold">
-                            <DollarSign className="h-5 w-5" />
-                            <span>Total: ${totalExpenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+                            <Coins className="h-5 w-5" />
+                            <span>Total: {formatCurrency(totalExpenses)}</span>
                         </div>
                     </div>
 
@@ -132,7 +133,7 @@ export default function ExpensesPage() {
                                             </TableCell>
                                             <TableCell className="text-slate-300">{exp.description}</TableCell>
                                             <TableCell className="text-right text-amber-400 font-bold">
-                                                -${Number(exp.amount).toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                -{formatCurrency(exp.amount)}
                                             </TableCell>
                                         </TableRow>
                                     ))

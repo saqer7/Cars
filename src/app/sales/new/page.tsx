@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
+import { formatCurrency } from "@/lib/utils"
 
 interface Product {
     id: string
@@ -169,7 +170,7 @@ export default function POSPage() {
                                                         <p className="text-sm text-slate-400">{p.carBrand} {p.carModel}</p>
                                                     </div>
                                                     <div className="text-right">
-                                                        <div className="text-emerald-400 font-bold">${Number(p.sellingPrice).toFixed(2)}</div>
+                                                        <div className="text-emerald-400 font-bold">{formatCurrency(p.sellingPrice)}</div>
                                                         <div className={`text-xs ${p.stockQuantity < 3 ? 'text-red-400 font-bold' : 'text-slate-500'}`}>
                                                             Stock: {p.stockQuantity}
                                                         </div>
@@ -222,7 +223,7 @@ export default function POSPage() {
                                         <div key={item.id} className="flex gap-4">
                                             <div className="flex-1">
                                                 <h4 className="text-sm font-medium text-white line-clamp-1">{item.partName}</h4>
-                                                <p className="text-xs text-slate-400">${Number(item.sellingPrice).toFixed(2)} each</p>
+                                                <p className="text-xs text-slate-400">{formatCurrency(item.sellingPrice)} each</p>
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 <Button
@@ -246,7 +247,7 @@ export default function POSPage() {
                                             </div>
                                             <div className="text-right min-w-[80px]">
                                                 <div className="text-sm font-bold text-white">
-                                                    ${(item.quantity * Number(item.sellingPrice)).toFixed(2)}
+                                                    {formatCurrency(item.quantity * Number(item.sellingPrice))}
                                                 </div>
                                                 <button
                                                     onClick={() => removeFromCart(item.id)}
@@ -270,16 +271,16 @@ export default function POSPage() {
                             <div className="w-full space-y-2">
                                 <div className="flex justify-between text-sm text-slate-400">
                                     <span>Subtotal / المجموع الفرعي</span>
-                                    <span>${total.toFixed(2)}</span>
+                                    <span>{formatCurrency(total)}</span>
                                 </div>
                                 <div className="flex justify-between text-sm text-slate-400">
                                     <span>Tax (0%) / الضريبة</span>
-                                    <span>$0.00</span>
+                                    <span>{formatCurrency(0)}</span>
                                 </div>
                                 <Separator className="bg-slate-800" />
                                 <div className="flex justify-between text-lg font-bold text-white">
                                     <span>Total / الإجمالي</span>
-                                    <span>${total.toFixed(2)}</span>
+                                    <span>{formatCurrency(total)}</span>
                                 </div>
                             </div>
 
@@ -308,7 +309,7 @@ export default function POSPage() {
             {cart.length > 0 && (
                 <div className="fixed bottom-0 left-0 right-0 md:left-64 z-50 flex items-center justify-between gap-4 p-4 bg-slate-900/95 border-t border-slate-800 backdrop-blur supports-[backdrop-filter]:bg-slate-900/80">
                     <div className="font-bold text-white">
-                        Total: ${total.toLocaleString("en-US", { minimumFractionDigits: 2 })} ({cart.length} item{cart.length !== 1 ? "s" : ""})
+                        Total: {formatCurrency(total)} ({cart.length} item{cart.length !== 1 ? "s" : ""})
                     </div>
                     <Button
                         size="lg"

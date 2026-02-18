@@ -17,6 +17,7 @@ import {
 } from "recharts"
 import { Download, Filter } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { formatCurrency } from "@/lib/utils"
 
 interface ReportsData {
     monthlySales: { name: string; sales: number }[]
@@ -73,10 +74,11 @@ export default function ReportsPage() {
                                 <BarChart data={data?.monthlySales ?? []}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                                     <XAxis dataKey="name" stroke="#64748b" />
-                                    <YAxis stroke="#64748b" />
+                                    <YAxis stroke="#64748b" tickFormatter={(val) => `${Math.round(val)}`} />
                                     <Tooltip
                                         contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b" }}
                                         itemStyle={{ color: "#fff" }}
+                                        formatter={(val: number | undefined) => [formatCurrency(val ?? 0), "Sales"]}
                                     />
                                     <Bar dataKey="sales" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                                 </BarChart>
@@ -100,10 +102,11 @@ export default function ReportsPage() {
                                 <BarChart data={data?.monthlyExpenses ?? []}>
                                     <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
                                     <XAxis dataKey="name" stroke="#64748b" />
-                                    <YAxis stroke="#64748b" />
+                                    <YAxis stroke="#64748b" tickFormatter={(val) => `${Math.round(val)}`} />
                                     <Tooltip
                                         contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b" }}
                                         itemStyle={{ color: "#fff" }}
+                                        formatter={(val: number | undefined) => [formatCurrency(val ?? 0), "Expenses"]}
                                     />
                                     <Bar dataKey="expenses" fill="#f59e0b" radius={[4, 4, 0, 0]} />
                                 </BarChart>
@@ -136,20 +139,19 @@ export default function ReportsPage() {
                                         cx="50%"
                                         cy="50%"
                                         outerRadius={100}
-                                        label={({ name, percent }) => `${name} ${((percent||0) * 100).toFixed(0)}%`}
+                                        label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                                     >
                                         {data.inventoryDistribution.map((_, index) => (
                                             <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                                         ))}
                                     </Pie>
                                     <Tooltip
-    contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b" }}
-    formatter={(value: any, name: any) => {
-        const val = value !== undefined ? value : 0;
-        const n = name !== undefined ? name : "";
-                return [`${val} units`, "Details"]; 
-    }}
-/>
+                                        contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b" }}
+                                        formatter={(value: any, name: any) => {
+                                            const val = value !== undefined ? value : 0;
+                                            return [`${val} units`, name];
+                                        }}
+                                    />
                                     <Legend />
                                 </PieChart>
                             </ResponsiveContainer>

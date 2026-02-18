@@ -229,13 +229,12 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                 render={({ field }) => (
                                     <FormItem>
                                         <div className="flex justify-between">
-                                            <FormLabel>Cost</FormLabel>
+                                            <FormLabel>Cost (ILS)</FormLabel>
                                             <FormLabel dir="rtl">التكلفة</FormLabel>
                                         </div>
                                         <FormControl>
                                             <Input
                                                 type="number"
-                                                step="0.01"
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                                 className="bg-slate-950 border-slate-800 text-white"
@@ -251,13 +250,12 @@ export function AddProductModal({ open, onOpenChange }: AddProductModalProps) {
                                 render={({ field }) => (
                                     <FormItem>
                                         <div className="flex justify-between">
-                                            <FormLabel>Selling</FormLabel>
+                                            <FormLabel>Selling (ILS)</FormLabel>
                                             <FormLabel dir="rtl">البيع</FormLabel>
                                         </div>
                                         <FormControl>
                                             <Input
                                                 type="number"
-                                                step="0.01"
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                                 className="bg-slate-950 border-slate-800 text-white"

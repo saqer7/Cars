@@ -221,11 +221,10 @@ export function EditProductModal({ open, onOpenChange, product }: EditProductMod
                                 name="costPrice"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Cost</FormLabel>
+                                        <FormLabel>Cost (ILS)</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
-                                                step="0.01"
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                                 value={field.value ?? ""}
@@ -241,11 +240,10 @@ export function EditProductModal({ open, onOpenChange, product }: EditProductMod
                                 name="sellingPrice"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Selling Price</FormLabel>
+                                        <FormLabel>Selling Price (ILS)</FormLabel>
                                         <FormControl>
                                             <Input
                                                 type="number"
-                                                step="0.01"
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                                 value={field.value ?? ""}

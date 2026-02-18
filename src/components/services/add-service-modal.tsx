@@ -279,13 +279,12 @@ export function AddServiceModal({ open, onOpenChange }: AddServiceModalProps) {
                                 render={({ field }) => (
                                     <FormItem>
                                         <div className="flex justify-between">
-                                            <FormLabel>Total Price ($)</FormLabel>
+                                            <FormLabel>Total Price (ILS)</FormLabel>
                                             <FormLabel dir="rtl">السعر الإجمالي</FormLabel>
                                         </div>
                                         <FormControl>
                                             <Input
                                                 type="number"
-                                                step="0.01"
                                                 {...field}
                                                 onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                                                 className="bg-slate-950 border-slate-800 text-white text-lg font-bold"

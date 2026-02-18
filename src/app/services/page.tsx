@@ -28,6 +28,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AddServiceModal } from "@/components/services/add-service-modal"
 import type { UnifiedRecord } from "@/app/api/records/route"
+import { formatCurrency } from "@/lib/utils"
 
 export default function RecordsPage() {
     const [search, setSearch] = useState("")
@@ -254,7 +255,7 @@ export default function RecordsPage() {
                                             </TableCell>
                                             <TableCell className="text-right font-bold text-white">
                                                 <span className={record.type === "expense" ? "text-orange-400" : "text-white"}>
-                                                    {record.type === "expense" ? "-" : ""}${record.totalAmount.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                                                    {record.type === "expense" ? "-" : ""}{formatCurrency(record.totalAmount)}
                                                 </span>
                                             </TableCell>
                                         </TableRow>

@@ -20,6 +20,7 @@ import {
   Wallet
 } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
+import { formatCurrency } from "@/lib/utils"
 
 interface DashboardData {
   dailyRevenue: number
@@ -73,7 +74,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">
-              {isLoading ? "—" : `$${(data?.dailyRevenue ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
+              {isLoading ? "—" : formatCurrency(data?.dailyRevenue)}
             </div>
             <p className={`text-xs font-medium ${(data?.revenueChangePct ?? 0) >= 0 ? "text-emerald-500" : "text-red-500"}`}>
               {(data?.revenueChangePct ?? 0) >= 0 ? "+" : ""}{(data?.revenueChangePct ?? 0).toFixed(1)}% from yesterday / عن أمس
@@ -116,7 +117,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-white">
-              {isLoading ? "—" : `$${(data?.inventoryValue ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
+              {isLoading ? "—" : formatCurrency(data?.inventoryValue)}
             </div>
             <p className="text-xs text-slate-500">Total parts in stock / إجمالي القطع</p>
           </CardContent>
@@ -131,7 +132,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-amber-400">
-              {isLoading ? "—" : `-$${(data?.dailyExpenses ?? 0).toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
+              {isLoading ? "—" : `-${formatCurrency(data?.dailyExpenses)}`}
             </div>
             <p className="text-xs text-slate-500">Today / اليوم</p>
           </CardContent>
@@ -149,7 +150,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${(data?.dailyRevenue ?? 0) - (data?.dailyExpenses ?? 0) >= 0 ? "text-emerald-400" : "text-red-400"}`}>
-              {isLoading ? "—" : `$${((data?.dailyRevenue ?? 0) - (data?.dailyExpenses ?? 0)).toLocaleString("en-US", { minimumFractionDigits: 2 })}`}
+              {isLoading ? "—" : formatCurrency((data?.dailyRevenue ?? 0) - (data?.dailyExpenses ?? 0))}
             </div>
             <p className="text-xs text-slate-500">Revenue minus expenses / الدخل بعد خصم المصاريف</p>
           </CardContent>
@@ -200,7 +201,7 @@ export default function Dashboard() {
                       {item.car && <p className="text-xs text-slate-400">{item.car}</p>}
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-bold text-white">${Number(item.price).toLocaleString("en-US", { minimumFractionDigits: 2 })}</p>
+                      <p className="text-sm font-bold text-white">{formatCurrency(item.price)}</p>
                       <p className="text-[10px] text-slate-500">{formatDistanceToNow(new Date(item.time), { addSuffix: true })}</p>
                     </div>
                   </div>

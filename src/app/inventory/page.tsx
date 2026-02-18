@@ -46,6 +46,8 @@ import { AddProductModal } from "@/components/inventory/add-product-modal"
 import { EditProductModal } from "@/components/inventory/edit-product-modal"
 import { AdjustStockModal } from "@/components/inventory/adjust-stock-modal"
 
+import { formatCurrency } from "@/lib/utils"
+
 interface Product {
     id: string
     partName: string
@@ -119,13 +121,7 @@ function buildColumns(
         {
             accessorKey: "sellingPrice",
             header: () => <div className="flex flex-col"><span>Price</span><span dir="rtl" className="text-xs opacity-70">السعر</span></div>,
-            cell: ({ row }) => {
-                const price = parseFloat(row.getValue("sellingPrice"))
-                return new Intl.NumberFormat("en-US", {
-                    style: "currency",
-                    currency: "USD",
-                }).format(price)
-            },
+            cell: ({ row }) => formatCurrency(row.getValue("sellingPrice")),
         },
         {
             accessorKey: "binLocation",
