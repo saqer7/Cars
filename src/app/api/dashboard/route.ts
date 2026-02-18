@@ -1,23 +1,18 @@
 import { NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import {
+  format,
   startOfDay,
   endOfDay,
   subDays,
-  format,
-  startOfMonth,
-  endOfMonth,
 } from "date-fns"
+import { getJerusalemTodayRange, getJerusalemNow } from "@/lib/date-utils"
 
 const LOW_STOCK_THRESHOLD = 3
 
 export async function GET() {
   try {
-    const now = new Date()
-    const todayStart = startOfDay(now)
-    const todayEnd = endOfDay(now)
-    const yesterdayStart = startOfDay(subDays(now, 1))
-    const yesterdayEnd = endOfDay(subDays(now, 1))
+    const { start: todayStart, end: todayEnd, yesterdayStart, yesterdayEnd, jNow } = getJerusalemTodayRange()
 
     // Daily revenue (Sales + Services for today)
     const [todaySales, todayServices, yesterdaySales, yesterdayServices] =
@@ -97,9 +92,14 @@ export async function GET() {
     // Revenue trends (last 7 days)
     const revenueByDay = await Promise.all(
       Array.from({ length: 7 }, async (_, i) => {
-        const day = subDays(now, 6 - i)
+        const day = subDays(jNow, 6 - i)
         const dayStart = startOfDay(day)
         const dayEnd = endOfDay(day)
+
+        // Note: For the chart, we can be slightly less precise about the exact UTC moment 
+        // as long as the days are consistent, but for today/yesterday metrics we were exact above.
+        // Let's stick to the same logic for consistency in the trend.
+
         const [daySales, dayServices] = await Promise.all([
           prisma.sale.aggregate({
             where: {
