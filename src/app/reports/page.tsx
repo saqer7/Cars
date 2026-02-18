@@ -136,18 +136,20 @@ export default function ReportsPage() {
                                         cx="50%"
                                         cy="50%"
                                         outerRadius={100}
-                                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                        label={({ name, percent }) => `${name} ${((percent||0) * 100).toFixed(0)}%`}
                                     >
                                         {data.inventoryDistribution.map((_, index) => (
                                             <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                                         ))}
                                     </Pie>
                                     <Tooltip
-                                        contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b" }}
-                                        formatter={(value: number, _name: string, props: { payload: { value: number } }) =>
-                                            `${value} units • $${props.payload.value.toLocaleString()}`
-                                        }
-                                    />
+    contentStyle={{ backgroundColor: "#0f172a", border: "1px solid #1e293b" }}
+    formatter={(value: any, name: any) => {
+        const val = value !== undefined ? value : 0;
+        const n = name !== undefined ? name : "";
+                return [`${val} units`, "Details"]; 
+    }}
+/>
                                     <Legend />
                                 </PieChart>
                             </ResponsiveContainer>
