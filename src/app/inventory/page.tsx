@@ -45,6 +45,7 @@ import { toast } from "sonner"
 import { AddProductModal } from "@/components/inventory/add-product-modal"
 import { EditProductModal } from "@/components/inventory/edit-product-modal"
 import { AdjustStockModal } from "@/components/inventory/adjust-stock-modal"
+import { DeleteConfirmationDialog } from "@/components/shared/delete-confirmation-dialog"
 
 import { formatCurrency } from "@/lib/utils"
 
@@ -175,6 +176,8 @@ export default function InventoryPage() {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
     const [isAdjustModalOpen, setIsAdjustModalOpen] = useState(false)
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+    const [isDeleting, setIsDeleting] = useState(false)
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
     const handleEdit = useCallback((product: Product) => {
@@ -187,19 +190,29 @@ export default function InventoryPage() {
         setIsAdjustModalOpen(true)
     }, [])
 
-    const handleDelete = useCallback(async (product: Product) => {
-        if (!confirm(`Delete "${product.partName}"? This cannot be undone.`)) return
+    const handleDelete = useCallback((product: Product) => {
+        setSelectedProduct(product)
+        setIsDeleteDialogOpen(true)
+    }, [])
+
+    const confirmDelete = async () => {
+        if (!selectedProduct) return
+        setIsDeleting(true)
         try {
-            const res = await fetch(`/api/inventory/${product.id}`, { method: "DELETE" })
+            const res = await fetch(`/api/inventory/${selectedProduct.id}`, { method: "DELETE" })
             if (!res.ok) throw new Error("Failed to delete")
             queryClient.invalidateQueries({ queryKey: ["inventory"] })
             queryClient.invalidateQueries({ queryKey: ["dashboard"] })
             queryClient.invalidateQueries({ queryKey: ["reports"] })
-            toast.success("Item deleted")
+            toast.success("Item deleted / تم حذف القطعة")
+            setIsDeleteDialogOpen(false)
         } catch {
-            toast.error("Failed to delete item")
+            toast.error("Failed to delete item / فشل حذف القطعة")
+        } finally {
+            setIsDeleting(false)
+            setSelectedProduct(null)
         }
-    }, [queryClient])
+    }
 
     const columns = useMemo(
         () => buildColumns(handleEdit, handleAdjustStock, handleDelete),
@@ -262,6 +275,15 @@ export default function InventoryPage() {
                     if (!open) setSelectedProduct(null)
                 }}
                 product={selectedProduct}
+            />
+
+            <DeleteConfirmationDialog
+                open={isDeleteDialogOpen}
+                onOpenChange={setIsDeleteDialogOpen}
+                onConfirm={confirmDelete}
+                isPending={isDeleting}
+                title="Delete Product / حذف القطعة"
+                description={`Are you sure you want to delete "${selectedProduct?.partName}"? This action cannot be undone. / هل أنت متأكد من حذف "${selectedProduct?.partName}"؟ لا يمكن التراجع عن هذا الإجراء.`}
             />
 
             <Card className="bg-slate-900 border-slate-800">

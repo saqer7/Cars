@@ -1,10 +1,11 @@
 "use client"
 
-import { useQuery } from "@tanstack/react-query"
-import { Plus, Search, Coins } from "lucide-react"
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query"
+import { Plus, Search, Coins, Pencil, Trash2 } from "lucide-react"
 import { useState } from "react"
 import { format } from "date-fns"
 import { formatCurrency } from "@/lib/utils"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,6 +21,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { AddExpenseModal } from "@/components/expenses/add-expense-modal"
+import { EditExpenseModal } from "@/components/expenses/edit-expense-modal"
+import { DeleteConfirmationDialog } from "@/components/shared/delete-confirmation-dialog"
 
 interface Expense {
     id: string
@@ -41,7 +44,11 @@ const TYPE_LABELS: Record<string, { en: string; ar: string }> = {
 export default function ExpensesPage() {
     const [search, setSearch] = useState("")
     const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+    const [editingExpense, setEditingExpense] = useState<Expense | null>(null)
+    const [expenseToDelete, setExpenseToDelete] = useState<Expense | null>(null)
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
+    const queryClient = useQueryClient()
     const { data: expenses, isLoading } = useQuery<Expense[]>({
         queryKey: ["expenses"],
         queryFn: async () => {
@@ -49,6 +56,23 @@ export default function ExpensesPage() {
             if (!res.ok) throw new Error("Failed to fetch")
             return res.json()
         },
+    })
+
+    const deleteMutation = useMutation({
+        mutationFn: async (id: string) => {
+            const res = await fetch(`/api/expenses/${id}`, { method: "DELETE" })
+            if (!res.ok) throw new Error("Failed to delete")
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["expenses"] })
+            queryClient.invalidateQueries({ queryKey: ["dashboard"] })
+            toast.success("Expense deleted / تم حذف المصروف")
+            setIsDeleteDialogOpen(false)
+            setExpenseToDelete(null)
+        },
+        onError: () => {
+            toast.error("Failed to delete expense / فشل حذف المصروف")
+        }
     })
 
     const filtered = expenses?.filter(
@@ -81,6 +105,20 @@ export default function ExpensesPage() {
             </div>
 
             <AddExpenseModal open={isAddModalOpen} onOpenChange={setIsAddModalOpen} />
+            <EditExpenseModal
+                expense={editingExpense}
+                open={!!editingExpense}
+                onOpenChange={(open) => !open && setEditingExpense(null)}
+            />
+
+            <DeleteConfirmationDialog
+                open={isDeleteDialogOpen}
+                onOpenChange={setIsDeleteDialogOpen}
+                onConfirm={() => expenseToDelete && deleteMutation.mutate(expenseToDelete.id)}
+                isPending={deleteMutation.isPending}
+                title="Delete Expense / حذف المصروف"
+                description={`Are you sure you want to delete this ${expenseToDelete?.type} expense for ${expenseToDelete ? formatCurrency(expenseToDelete.amount) : ""}? / هل أنت متأكد من حذف هذا المصروف؟`}
+            />
 
             <Card className="bg-slate-900 border-slate-800">
                 <CardContent className="pt-6">
@@ -108,12 +146,14 @@ export default function ExpensesPage() {
                                     <TableHead className="text-slate-400">Type / النوع</TableHead>
                                     <TableHead className="text-slate-400">Description / الوصف</TableHead>
                                     <TableHead className="text-slate-400 text-right">Amount / المبلغ</TableHead>
+                                    <TableHead className="text-slate-400 text-right w-[100px]">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {isLoading ? (
                                     Array.from({ length: 5 }).map((_, i) => (
                                         <TableRow key={i} className="border-slate-800">
+                                            <TableCell><Skeleton className="h-6 w-full bg-slate-800" /></TableCell>
                                             <TableCell><Skeleton className="h-6 w-full bg-slate-800" /></TableCell>
                                             <TableCell><Skeleton className="h-6 w-full bg-slate-800" /></TableCell>
                                             <TableCell><Skeleton className="h-6 w-full bg-slate-800" /></TableCell>
@@ -135,11 +175,34 @@ export default function ExpensesPage() {
                                             <TableCell className="text-right text-amber-400 font-bold">
                                                 -{formatCurrency(exp.amount)}
                                             </TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-1">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-slate-400 hover:text-white hover:bg-slate-800"
+                                                        onClick={() => setEditingExpense(exp)}
+                                                    >
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-slate-400 hover:text-red-400 hover:bg-slate-800"
+                                                        onClick={() => {
+                                                            setExpenseToDelete(exp)
+                                                            setIsDeleteDialogOpen(true)
+                                                        }}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </TableCell>
                                         </TableRow>
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="h-24 text-center text-slate-500">
+                                        <TableCell colSpan={5} className="h-24 text-center text-slate-500">
                                             No expenses found / لا توجد مصاريف.
                                         </TableCell>
                                     </TableRow>
