@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id               String   @id @default(cuid())
+  partName         String   @map("part_name")
+  carBrand         String   @map("car_brand")
+  carModel         String   @map("car_model")
+  yearRange        String   @map("year_range")
+  category         String   // Switches, Motors, Keys
+  stockQuantity    Int      @default(0) @map("stock_quantity")
+  costPrice        Decimal  @db.Decimal(10, 2) @map("cost_price")
+  sellingPrice     Decimal  @db.Decimal(10, 2) @map("selling_price")
+  binLocation      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  serviceParts     ServicePart[]
+  saleItems        SaleItem[]
+}
+
+model ServiceRecord {
+  id               String   @id @default(cuid())
+  customerName     String
+  carPlateNumber   String
+  serviceType      String
+  technicianNotes  String?
+  totalPrice       Decimal  @db.Decimal(10, 2)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  partsUsed        ServicePart[]
+}
+
+model ServicePart {
+  id               String        @id @default(cuid())
+  serviceId        String
+  productId        String
+  quantity         Int
+  priceAtSale      Decimal       @db.Decimal(10, 2)
+  
+  service          ServiceRecord @relation(fields: [serviceId], references: [id])
+  product          Product       @relation(fields: [productId], references: [id])
+}
+
+model Sale {
+  id               String   @id @default(cuid())
+  totalAmount      Decimal  @db.Decimal(10, 2)
+  taxAmount       Decimal  @db.Decimal(10, 2)
+  status           String   @default("COMPLETED") // COMPLETED, CANCELLED
+  createdAt        DateTime @default(now())
+  items            SaleItem[]
+}
+
+model SaleItem {
+  id               String   @id @default(cuid())
+  saleId           String
+  productId        String
+  quantity         Int
+  priceAtSale      Decimal  @db.Decimal(10, 2)
+  
+  sale             Sale     @relation(fields: [saleId], references: [id])
+  product          Product  @relation(fields: [productId], references: [id])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  type        String   // PARTS, SERVICE, RENT, UTILITIES, OTHER
+  description String
+  amount      Decimal  @db.Decimal(10, 2)
+  expenseDate DateTime @map("expense_date")
+  createdAt   DateTime @default(now())
+}
