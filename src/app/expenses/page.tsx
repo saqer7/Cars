@@ -15,7 +15,7 @@ import {
     TableCell,
     TableHead,
     TableHeader,
-    TableRow,
+    TableRow, 
 } from "@/components/ui/table"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -25,8 +25,8 @@ import { EditExpenseModal } from "@/components/expenses/edit-expense-modal"
 import { DeleteConfirmationDialog } from "@/components/shared/delete-confirmation-dialog"
 
 interface Expense {
-    id: string
     type: string
+    id: string
     description: string
     amount: number
     expenseDate: string
